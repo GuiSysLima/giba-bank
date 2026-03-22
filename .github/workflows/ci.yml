@@ -33,6 +33,9 @@ jobs:
       - name: Check format
         run: cargo fmt --check
 
+      - name: Verify SQLx data up to date
+        run: cargo sqlx prepare --check -- --all-targets
+
       - name: Run Clippy
         run: cargo clippy -- -D warnings
 
