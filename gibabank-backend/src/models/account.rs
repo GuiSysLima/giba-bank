@@ -5,7 +5,8 @@ use sqlx::{FromRow, Type};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "account_type", rename_all = "lowercase")]
+#[sqlx(type_name = "account_type", rename_all = "UPPERCASE")]
+#[serde(rename_all = "UPPERCASE")]
 pub enum AccountType {
     Checking,
     Savings,

@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(type_name = "user_type", rename_all = "lowercase")]
+#[sqlx(type_name = "user_type", rename_all = "UPPERCASE")]
+#[serde(rename_all = "UPPERCASE")]
 pub enum UserType {
     Common,
     Merchant,
