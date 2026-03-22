@@ -1,7 +1,7 @@
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
+use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::net::SocketAddr;
-use dotenvy::dotenv;
 use tokio::net::TcpListener;
 
 #[tokio::main]
@@ -14,13 +14,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .connect(&database_url)
         .await?;
 
-    let row = sqlx::query!(
-        "SELECT 1 + 1 as result"
-    )
-    .fetch_one(&pool)
-    .await?;
+    let row = sqlx::query!("SELECT 1 + 1 as result")
+        .fetch_one(&pool)
+        .await?;
 
-    println!("✅ Teste de query SQLx: 1 + 1 = {}", row.result.unwrap_or(0));
+    println!(
+        "✅ Teste de query SQLx: 1 + 1 = {}",
+        row.result.unwrap_or(0)
+    );
 
     let app = Router::new()
         .route("/", get(|| async { "Giba Bank API Online!" }))
@@ -30,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let listener = TcpListener::bind(addr).await?;
     println!("🚀 Giba Bank rodando em http://{}", addr);
-    
+
     axum::serve(listener, app).await?;
 
     Ok(())
