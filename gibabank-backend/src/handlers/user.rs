@@ -33,14 +33,14 @@ pub async fn create_user(
     match result {
         Ok(user) => (StatusCode::CREATED, Json(user)).into_response(),
         Err(e) => {
-            if let Some(db_error) = e.as_database_error() {
-                if db_error.code() == Some(std::borrow::Cow::Borrowed("23505")) {
-                    return (
-                        StatusCode::CONFLICT,
-                        "Usuário com este CPF ou Email já existe",
-                    )
-                        .into_response();
-                }
+            if let Some(db_error) = e.as_database_error()
+                && db_error.code() == Some(std::borrow::Cow::Borrowed("23505"))
+            {
+                return (
+                    StatusCode::CONFLICT,
+                    "Usuário com este CPF ou Email já existe",
+                )
+                    .into_response();
             }
             eprintln!("Erro ao criar usuário: {:?}", e);
             (
