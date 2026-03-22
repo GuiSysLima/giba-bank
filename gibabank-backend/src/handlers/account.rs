@@ -1,4 +1,4 @@
-use crate::models::account::{Account, CreateAccountDto};
+use crate::models::account::{Account, CreateAccountDto, DepositDto};
 use axum::extract::Path;
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use sqlx::PgPool;
@@ -61,6 +61,42 @@ pub async fn list_accounts_by_user(
         Err(e) => {
             eprintln!("Erro ao buscar contas: {:?}", e);
             (StatusCode::INTERNAL_SERVER_ERROR, "Erro ao buscar contas").into_response()
+        }
+    }
+}
+
+#[axum::debug_handler]
+pub async fn deposit(
+    State(pool): State<PgPool>,
+    Path(account_id): Path<Uuid>,
+    Json(payload): Json<DepositDto>,
+) -> impl IntoResponse {
+    if payload.amount <= rust_decimal::Decimal::ZERO {
+        return (StatusCode::BAD_REQUEST, "O valor deve ser maior que zero").into_response();
+    }
+
+    let result = sqlx::query!(
+        r#"
+        UPDATE accounts 
+        SET balance = balance + $1 
+        WHERE id = $2
+        RETURNING balance
+        "#,
+        payload.amount,
+        account_id
+    )
+    .fetch_one(&pool)
+    .await;
+
+    match result {
+        Ok(record) => (StatusCode::OK, Json(record.balance)).into_response(),
+        Err(e) => {
+            eprintln!("Erro ao realizar depósito: {:?}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Erro ao processar depósito",
+            )
+                .into_response()
         }
     }
 }

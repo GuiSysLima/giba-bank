@@ -12,6 +12,11 @@ pub enum AccountType {
     Savings,
 }
 
+#[derive(Deserialize)]
+pub struct DepositDto {
+    pub amount: Decimal,
+}
+
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Account {
     pub id: Uuid,
