@@ -2,13 +2,13 @@ name: Rust CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main", "dev"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main", "dev"]
 
 env:
   CARGO_TERM_COLOR: always
-  SQLX_OFFLINE: true 
+  SQLX_OFFLINE: true
 
 jobs:
   build:
@@ -18,23 +18,30 @@ jobs:
         working-directory: ./gibabank-backend
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        components: clippy, rustfmt
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
 
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2
-      with:
-        workspaces: ./gibabank-backend
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./gibabank-backend
+          cache-targets: true
 
-    - name: Check format
-      run: cargo fmt --check
+      - name: Install sqlx-cli
+        run: hash cargo-sqlx 2>/dev/null || cargo install sqlx-cli --no-default-features --features postgres
 
-    - name: Run Clippy
-      run: cargo clippy -- -D warnings
+      - name: Check format
+        run: cargo fmt --check
 
-    - name: Run tests
-      run: cargo test
+      - name: Verify SQLx data up to date
+        run: cargo sqlx prepare --check -- --all-targets
+
+      - name: Run Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Run tests
+        run: cargo test
