@@ -22,8 +22,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(|| async { "Giba Bank API Online!" }))
-        .route("/users", post(handlers::user::create_user)) // Nova rota
+        .route("/users", post(handlers::user::create_user))
         .route("/accounts", post(handlers::account::create_account))
+        .route(
+            "/users/:id/accounts",
+            get(handlers::account::list_accounts_by_user),
+        )
         .with_state(pool);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));

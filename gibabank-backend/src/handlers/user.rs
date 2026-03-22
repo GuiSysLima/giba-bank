@@ -1,11 +1,19 @@
 use crate::models::user::{CreateUserDto, User};
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use bcrypt::{DEFAULT_COST, hash};
 use sqlx::PgPool;
 
 pub async fn create_user(
     State(pool): State<PgPool>,
     Json(payload): Json<CreateUserDto>,
 ) -> impl IntoResponse {
+    let hashed_password = match hash(payload.password, DEFAULT_COST) {
+        Ok(h) => h,
+        Err(_) => {
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Erro ao processar senha").into_response();
+        }
+    };
+
     let result = sqlx::query_as!(
         User,
         r#"
@@ -16,7 +24,7 @@ pub async fn create_user(
         payload.full_name,
         payload.cpf_cnpj,
         payload.email,
-        payload.password,
+        hashed_password,
         payload.user_type as _
     )
     .fetch_one(&pool)
@@ -25,8 +33,21 @@ pub async fn create_user(
     match result {
         Ok(user) => (StatusCode::CREATED, Json(user)).into_response(),
         Err(e) => {
+            if let Some(db_error) = e.as_database_error() {
+                if db_error.code() == Some(std::borrow::Cow::Borrowed("23505")) {
+                    return (
+                        StatusCode::CONFLICT,
+                        "Usuário com este CPF ou Email já existe",
+                    )
+                        .into_response();
+                }
+            }
             eprintln!("Erro ao criar usuário: {:?}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Erro ao criar usuário").into_response()
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Erro interno no servidor",
+            )
+                .into_response()
         }
     }
 }
