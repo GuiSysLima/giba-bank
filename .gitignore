@@ -1,0 +1,30 @@
+# --- Rust ---
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# --- Variáveis de Ambiente ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Docker ---
+.docker/
+pgdata/
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.history/
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- SQLx ---
+.sqlx/
