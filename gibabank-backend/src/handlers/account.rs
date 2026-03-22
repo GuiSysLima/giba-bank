@@ -1,4 +1,5 @@
 use crate::models::account::{Account, CreateAccountDto, DepositDto, TransferDto};
+use crate::models::transaction::TransactionType;
 use axum::extract::Path;
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use sqlx::PgPool;
@@ -75,32 +76,62 @@ pub async fn deposit(
         return (StatusCode::BAD_REQUEST, "O valor deve ser maior que zero").into_response();
     }
 
-    let result = sqlx::query!(
-        r#"
-        UPDATE accounts 
-        SET balance = balance + $1 
-        WHERE id = $2
-        RETURNING balance
-        "#,
+    let mut tx = match pool.begin().await {
+        Ok(t) => t,
+        Err(_) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Erro ao iniciar transação",
+            )
+                .into_response();
+        }
+    };
+
+    let update_result = sqlx::query!(
+        "UPDATE accounts SET balance = balance + $1 WHERE id = $2 RETURNING balance",
         payload.amount,
         account_id
     )
-    .fetch_one(&pool)
+    .fetch_one(&mut *tx)
     .await;
 
-    match result {
-        Ok(record) => (StatusCode::OK, Json(record.balance)).into_response(),
-        Err(e) => {
-            eprintln!("Erro ao realizar depósito: {:?}", e);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Erro ao processar depósito",
-            )
-                .into_response()
-        }
+    let balance = match update_result {
+        Ok(record) => record.balance,
+        Err(_) => return (StatusCode::NOT_FOUND, "Conta não encontrada").into_response(),
+    };
+
+    let history_result = sqlx::query!(
+        r#"
+        INSERT INTO transactions (account_from_id, account_to_id, amount, transaction_type)
+        VALUES ($1, $2, $3, $4)
+        "#,
+        None as Option<Uuid>,
+        account_id,
+        payload.amount,
+        TransactionType::Deposit as _
+    )
+    .execute(&mut *tx)
+    .await;
+
+    if history_result.is_err() {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Erro ao gravar histórico",
+        )
+            .into_response();
+    }
+
+    match tx.commit().await {
+        Ok(_) => (StatusCode::OK, Json(balance)).into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Erro ao confirmar depósito",
+        )
+            .into_response(),
     }
 }
 
+#[axum::debug_handler]
 pub async fn transfer(
     State(pool): State<PgPool>,
     Json(payload): Json<TransferDto>,
@@ -129,30 +160,47 @@ pub async fn transfer(
     .await;
 
     if let Ok(None) = debit_result {
-        return (
-            StatusCode::BAD_REQUEST,
-            "Saldo insuficiente ou conta de origem inexistente",
-        )
-            .into_response();
+        return (StatusCode::BAD_REQUEST, "Saldo insuficiente").into_response();
     }
 
-    let credit_result = sqlx::query!(
+    if (sqlx::query!(
         "UPDATE accounts SET balance = balance + $1 WHERE id = $2",
         payload.amount,
         payload.to_account_id
     )
     .execute(&mut *tx)
-    .await;
-
-    if credit_result.is_err() {
+    .await)
+        .is_err()
+    {
         return (StatusCode::BAD_REQUEST, "Conta de destino não encontrada").into_response();
     }
 
+    let history_result = sqlx::query!(
+        r#"
+        INSERT INTO transactions (account_from_id, account_to_id, amount, transaction_type)
+        VALUES ($1, $2, $3, $4)
+        "#,
+        payload.from_account_id,
+        payload.to_account_id,
+        payload.amount,
+        TransactionType::Transfer as _
+    )
+    .execute(&mut *tx)
+    .await;
+
+    if history_result.is_err() {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Erro ao gravar histórico",
+        )
+            .into_response();
+    }
+
     match tx.commit().await {
-        Ok(_) => (StatusCode::OK, "Transferência realizada com sucesso").into_response(),
+        Ok(_) => (StatusCode::OK, "Transferência e registro concluídos").into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "Erro ao confirmar transferência",
+            "Erro ao confirmar operação",
         )
             .into_response(),
     }

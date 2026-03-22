@@ -26,6 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/accounts", post(handlers::account::create_account))
         .route("/accounts/:id/deposit", post(handlers::account::deposit))
         .route("/accounts/transfer", post(handlers::account::transfer))
+        .route("/addresses", post(handlers::address::create_address))
         .route(
             "/users/:id/accounts",
             get(handlers::account::list_accounts_by_user),

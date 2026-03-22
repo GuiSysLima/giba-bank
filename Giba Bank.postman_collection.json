@@ -10,7 +10,7 @@
       "name": "Criar",
       "item": [
         {
-          "name": "Criar Conta",
+          "name": "Cadastrar Conta",
           "request": {
             "method": "POST",
             "header": [],
@@ -24,17 +24,9 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/accounts",
-              "protocol": "http",
+              "raw": "{{URL}}accounts",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
-              ],
-              "port": "3000",
-              "path": [
-                "accounts"
+                "{{URL}}accounts"
               ]
             }
           },
@@ -140,7 +132,72 @@
           ]
         },
         {
-          "name": "Criar Usuário",
+          "name": "Cadastrar Endereço",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"user_id\": \"611de8cd-64f5-4ee0-8f8b-d41edf14fb89\",\r\n  \"street\": \"Rua das Flores\",\r\n  \"number\": \"123\",\r\n  \"complement\": \"Apto 402\",\r\n  \"neighborhood\": \"Centro\",\r\n  \"city\": \"Garanhuns\",\r\n  \"state\": \"PE\",\r\n  \"zip_code\": \"55290-000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}addresses",
+              "host": [
+                "{{URL}}addresses"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Cadastrar Endereço",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"user_id\": \"611de8cd-64f5-4ee0-8f8b-d41edf14fb89\",\r\n  \"street\": \"Rua das Flores\",\r\n  \"number\": \"123\",\r\n  \"complement\": \"Apto 402\",\r\n  \"neighborhood\": \"Centro\",\r\n  \"city\": \"Garanhuns\",\r\n  \"state\": \"PE\",\r\n  \"zip_code\": \"55290-000\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{URL}}addresses",
+                  "host": [
+                    "{{URL}}addresses"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "content-length",
+                  "value": "281"
+                },
+                {
+                  "key": "date",
+                  "value": "Sun, 22 Mar 2026 16:40:28 GMT"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"8975c249-ad08-41c4-b456-a547671cd8e4\",\n    \"user_id\": \"611de8cd-64f5-4ee0-8f8b-d41edf14fb89\",\n    \"street\": \"Rua das Flores\",\n    \"number\": \"123\",\n    \"complement\": \"Apto 402\",\n    \"neighborhood\": \"Centro\",\n    \"city\": \"Garanhuns\",\n    \"state\": \"PE\",\n    \"zip_code\": \"55290-000\",\n    \"created_at\": \"2026-03-22T16:40:28.247786Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar  Usuário",
           "request": {
             "method": "POST",
             "header": [],
@@ -154,17 +211,9 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/users",
-              "protocol": "http",
+              "raw": "{{URL}}users",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
-              ],
-              "port": "3000",
-              "path": [
-                "users"
+                "{{URL}}users"
               ]
             }
           },
@@ -289,17 +338,11 @@
               }
             ],
             "url": {
-              "raw": "http://127.0.0.1:3000/users/d07891e6-4898-481c-8a5a-d927d7a6aa4e/accounts",
-              "protocol": "http",
+              "raw": "{{URL}}users/d07891e6-4898-481c-8a5a-d927d7a6aa4e/accounts",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
+                "{{URL}}users"
               ],
-              "port": "3000",
               "path": [
-                "users",
                 "d07891e6-4898-481c-8a5a-d927d7a6aa4e",
                 "accounts"
               ]
@@ -327,17 +370,11 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/accounts/2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06/deposit",
-              "protocol": "http",
+              "raw": "{{URL}}accounts/2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06/deposit",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
+                "{{URL}}accounts"
               ],
-              "port": "3000",
               "path": [
-                "accounts",
                 "2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06",
                 "deposit"
               ]
@@ -365,17 +402,11 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/accounts/transfer",
-              "protocol": "http",
+              "raw": "{{URL}}accounts/transfer",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
+                "{{URL}}accounts"
               ],
-              "port": "3000",
               "path": [
-                "accounts",
                 "transfer"
               ]
             }
