@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        UPDATE accounts \n        SET balance = balance + $1 \n        WHERE id = $2\n        RETURNING balance\n        ",
+  "query": "UPDATE accounts SET balance = balance + $1 WHERE id = $2 RETURNING balance",
   "describe": {
     "columns": [
       {
@@ -19,5 +19,5 @@
       false
     ]
   },
-  "hash": "80a12a0b16152fdb7b1359e8b0f1a8ccbd6c072ab1fbc5b967d060c26a03fb94"
+  "hash": "8397507f17afe169f982542d90c5039f4759dd0c57357b373286a1abd659915a"
 }
