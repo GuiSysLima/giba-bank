@@ -1,4 +1,4 @@
-use crate::models::account::{Account, CreateAccountDto, DepositDto};
+use crate::models::account::{Account, CreateAccountDto, DepositDto, TransferDto};
 use axum::extract::Path;
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use sqlx::PgPool;
@@ -98,5 +98,62 @@ pub async fn deposit(
             )
                 .into_response()
         }
+    }
+}
+
+pub async fn transfer(
+    State(pool): State<PgPool>,
+    Json(payload): Json<TransferDto>,
+) -> impl IntoResponse {
+    if payload.amount <= rust_decimal::Decimal::ZERO {
+        return (StatusCode::BAD_REQUEST, "O valor deve ser maior que zero").into_response();
+    }
+
+    let mut tx = match pool.begin().await {
+        Ok(t) => t,
+        Err(_) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Erro ao iniciar transação",
+            )
+                .into_response();
+        }
+    };
+
+    let debit_result = sqlx::query!(
+        "UPDATE accounts SET balance = balance - $1 WHERE id = $2 AND balance >= $1 RETURNING balance",
+        payload.amount,
+        payload.from_account_id
+    )
+    .fetch_optional(&mut *tx)
+    .await;
+
+    if let Ok(None) = debit_result {
+        return (
+            StatusCode::BAD_REQUEST,
+            "Saldo insuficiente ou conta de origem inexistente",
+        )
+            .into_response();
+    }
+
+    let credit_result = sqlx::query!(
+        "UPDATE accounts SET balance = balance + $1 WHERE id = $2",
+        payload.amount,
+        payload.to_account_id
+    )
+    .execute(&mut *tx)
+    .await;
+
+    if credit_result.is_err() {
+        return (StatusCode::BAD_REQUEST, "Conta de destino não encontrada").into_response();
+    }
+
+    match tx.commit().await {
+        Ok(_) => (StatusCode::OK, "Transferência realizada com sucesso").into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Erro ao confirmar transferência",
+        )
+            .into_response(),
     }
 }

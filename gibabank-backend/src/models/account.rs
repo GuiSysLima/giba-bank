@@ -36,3 +36,10 @@ pub struct CreateAccountDto {
     pub agency: String,
     pub account_type: AccountType,
 }
+
+#[derive(Deserialize)]
+pub struct TransferDto {
+    pub from_account_id: Uuid,
+    pub to_account_id: Uuid,
+    pub amount: Decimal,
+}
