@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    owner_name TEXT NOT NULL,
-    balance DECIMAL(19, 4) NOT NULL DEFAULT 0.0000,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
