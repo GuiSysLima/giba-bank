@@ -24,17 +24,9 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/accounts",
-              "protocol": "http",
+              "raw": "{{URL}}accounts",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
-              ],
-              "port": "3000",
-              "path": [
-                "accounts"
+                "{{URL}}accounts"
               ]
             }
           },
@@ -154,17 +146,9 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/users",
-              "protocol": "http",
+              "raw": "{{URL}}users",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
-              ],
-              "port": "3000",
-              "path": [
-                "users"
+                "{{URL}}users"
               ]
             }
           },
@@ -289,17 +273,11 @@
               }
             ],
             "url": {
-              "raw": "http://127.0.0.1:3000/users/d07891e6-4898-481c-8a5a-d927d7a6aa4e/accounts",
-              "protocol": "http",
+              "raw": "{{URL}}users/d07891e6-4898-481c-8a5a-d927d7a6aa4e/accounts",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
+                "{{URL}}users"
               ],
-              "port": "3000",
               "path": [
-                "users",
                 "d07891e6-4898-481c-8a5a-d927d7a6aa4e",
                 "accounts"
               ]
@@ -327,17 +305,11 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/accounts/2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06/deposit",
-              "protocol": "http",
+              "raw": "{{URL}}accounts/2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06/deposit",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
+                "{{URL}}accounts"
               ],
-              "port": "3000",
               "path": [
-                "accounts",
                 "2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06",
                 "deposit"
               ]
@@ -365,17 +337,11 @@
               }
             },
             "url": {
-              "raw": "http://127.0.0.1:3000/accounts/transfer",
-              "protocol": "http",
+              "raw": "{{URL}}accounts/transfer",
               "host": [
-                "127",
-                "0",
-                "0",
-                "1"
+                "{{URL}}accounts"
               ],
-              "port": "3000",
               "path": [
-                "accounts",
                 "transfer"
               ]
             }
