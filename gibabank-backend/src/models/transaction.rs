@@ -10,6 +10,7 @@ pub enum TransactionType {
     Transfer,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Transaction {
     pub id: Uuid,
