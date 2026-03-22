@@ -17,6 +17,7 @@ pub struct User {
     pub cpf_cnpj: String,
     pub email: String,
     #[serde(skip_serializing)]
+    #[allow(dead_code)]
     pub password_hash: String,
     pub user_type: UserType,
     pub created_at: Option<DateTime<Utc>>,
