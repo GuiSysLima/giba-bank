@@ -29,6 +29,10 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: ./gibabank-backend
+          cache-targets: true
+
+      - name: Install sqlx-cli
+        run: hash cargo-sqlx 2>/dev/null || cargo install sqlx-cli --no-default-features --features postgres
 
       - name: Check format
         run: cargo fmt --check
