@@ -27,6 +27,3 @@ pgdata/
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# --- SQLx ---
-.sqlx/
