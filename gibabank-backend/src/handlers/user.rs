@@ -56,8 +56,8 @@ pub async fn create_user(
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
-    sub: String, // ID do usuário
-    exp: usize,  // Expiração
+    sub: String,
+    exp: usize,
 }
 
 pub async fn login(State(pool): State<PgPool>, Json(payload): Json<LoginDto>) -> impl IntoResponse {

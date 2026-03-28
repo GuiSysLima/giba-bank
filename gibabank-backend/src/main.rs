@@ -8,6 +8,7 @@ use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
 mod handlers;
+mod middleware;
 mod models;
 
 #[tokio::main]
@@ -28,6 +29,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/accounts/transfer", post(handlers::account::transfer))
         .route("/addresses", post(handlers::address::create_address))
         .route("/login", post(handlers::user::login))
+        .route(
+            "/accounts/:id/statement",
+            get(handlers::account::get_statement),
+        )
         .route(
             "/users/:id/accounts",
             get(handlers::account::list_accounts_by_user),

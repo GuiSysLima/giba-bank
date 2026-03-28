@@ -1,5 +1,6 @@
+use crate::middleware::auth::Claims;
 use crate::models::account::{Account, CreateAccountDto, DepositDto, TransferDto};
-use crate::models::transaction::TransactionType;
+use crate::models::transaction::{Transaction, TransactionType};
 use axum::extract::Path;
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use sqlx::PgPool;
@@ -25,7 +26,7 @@ pub async fn create_account(
         payload.agency,
         payload.account_type as _
     )
-    .fetch_all(&pool)
+    .fetch_one(&pool)
     .await;
 
     match result {
@@ -133,9 +134,28 @@ pub async fn deposit(
 
 #[axum::debug_handler]
 pub async fn transfer(
+    claims: Claims,
     State(pool): State<PgPool>,
     Json(payload): Json<TransferDto>,
 ) -> impl IntoResponse {
+    let account_owner = sqlx::query!(
+        "SELECT user_id FROM accounts WHERE id = $1",
+        payload.from_account_id
+    )
+    .fetch_optional(&pool)
+    .await;
+
+    match account_owner {
+        Ok(Some(record)) if record.user_id.to_string() == claims.sub => {}
+        _ => {
+            return (
+                StatusCode::FORBIDDEN,
+                "Você não tem permissão para transferir desta conta",
+            )
+                .into_response();
+        }
+    }
+
     if payload.amount <= rust_decimal::Decimal::ZERO {
         return (StatusCode::BAD_REQUEST, "O valor deve ser maior que zero").into_response();
     }
@@ -203,5 +223,38 @@ pub async fn transfer(
             "Erro ao confirmar operação",
         )
             .into_response(),
+    }
+}
+
+pub async fn get_statement(
+    _claims: crate::middleware::auth::Claims,
+    State(pool): State<PgPool>,
+    Path(account_id): Path<Uuid>,
+) -> impl IntoResponse {
+    let transactions = sqlx::query_as!(
+        Transaction,
+        r#"
+        SELECT 
+            id, 
+            account_from_id, 
+            account_to_id, 
+            amount, 
+            transaction_type as "transaction_type: _", 
+            created_at 
+        FROM transactions 
+        WHERE account_from_id = $1 OR account_to_id = $1
+        ORDER BY created_at DESC
+        "#,
+        account_id
+    )
+    .fetch_all(&pool)
+    .await;
+
+    match transactions {
+        Ok(list) => (StatusCode::OK, Json(list)).into_response(),
+        Err(e) => {
+            eprintln!("Erro ao buscar extrato: {:?}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, "Erro ao gerar extrato").into_response()
+        }
     }
 }
