@@ -327,7 +327,14 @@
           "name": "Listar Contas",
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkMDc4OTFlNi00ODk4LTQ4MWMtOGE1YS1kOTI3ZDdhNmFhNGUiLCJleHAiOjE3NzQ3OTY0MDR9.CCa7yaNmcg5sMeMdgk9ANUbvA3WWIIoC9N_RGIhxR3A",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [
@@ -338,12 +345,12 @@
               }
             ],
             "url": {
-              "raw": "{{URL}}users/d07891e6-4898-481c-8a5a-d927d7a6aa4e/accounts",
+              "raw": "{{URL}}users/a0a6edda-d066-4d73-907c-58c6754ef8e8/accounts",
               "host": [
                 "{{URL}}users"
               ],
               "path": [
-                "d07891e6-4898-481c-8a5a-d927d7a6aa4e",
+                "a0a6edda-d066-4d73-907c-58c6754ef8e8",
                 "accounts"
               ]
             }
@@ -394,7 +401,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"from_account_id\": \"2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06\",\r\n  \"to_account_id\": \"a0a6edda-d066-4d73-907c-58c6754ef8e8\",\r\n  \"amount\": 50.00\r\n}",
+              "raw": "{\r\n  \"from_account_id\": \"2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06\",\r\n  \"to_account_id\": \"a0a6edda-d066-4d73-907c-58c6754ef8e8\",\r\n  \"amount\": 20.00\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -414,6 +421,57 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"guilhermeteste@email.com\",\r\n    \"password\": \"1234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}login",
+          "host": [
+            "{{URL}}login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Extrato",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2MTFkZThjZC02NGY1LTRlZTAtOGY4Yi1kNDFlZGYxNGZiODkiLCJleHAiOjE3NzQ3OTU0MDZ9.VblhQKNI73l7tEcpdwi9wrUoVEukDd-DzqzjnsV3js4",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{URL}}accounts/2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06/statement",
+          "host": [
+            "{{URL}}accounts"
+          ],
+          "path": [
+            "2ce064c0-3ec9-43b9-8f9f-b213e3cd4c06",
+            "statement"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }
