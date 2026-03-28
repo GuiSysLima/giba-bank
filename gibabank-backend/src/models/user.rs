@@ -31,3 +31,15 @@ pub struct CreateUserDto {
     pub password: String,
     pub user_type: UserType,
 }
+
+#[derive(Deserialize)]
+pub struct LoginDto {
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Serialize)]
+pub struct AuthResponse {
+    pub token: String,
+    pub user: User,
+}
