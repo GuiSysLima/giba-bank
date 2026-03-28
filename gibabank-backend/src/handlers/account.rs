@@ -227,20 +227,34 @@ pub async fn transfer(
 }
 
 pub async fn get_statement(
-    _claims: crate::middleware::auth::Claims,
+    claims: crate::middleware::auth::Claims,
     State(pool): State<PgPool>,
     Path(account_id): Path<Uuid>,
 ) -> impl IntoResponse {
+    let account_check = sqlx::query!("SELECT user_id FROM accounts WHERE id = $1", account_id)
+        .fetch_optional(&pool)
+        .await;
+
+    match account_check {
+        Ok(Some(record)) => {
+            if record.user_id.to_string() != claims.sub {
+                return (
+                    StatusCode::FORBIDDEN,
+                    "Você não tem permissão para ver este extrato",
+                )
+                    .into_response();
+            }
+        }
+        Ok(None) => return (StatusCode::NOT_FOUND, "Conta não encontrada").into_response(),
+        Err(_) => {
+            return (StatusCode::INTERNAL_SERVER_ERROR, "Erro ao validar conta").into_response();
+        }
+    }
+
     let transactions = sqlx::query_as!(
         Transaction,
         r#"
-        SELECT 
-            id, 
-            account_from_id, 
-            account_to_id, 
-            amount, 
-            transaction_type as "transaction_type: _", 
-            created_at 
+        SELECT id, account_from_id, account_to_id, amount, transaction_type as "transaction_type: _", created_at 
         FROM transactions 
         WHERE account_from_id = $1 OR account_to_id = $1
         ORDER BY created_at DESC
