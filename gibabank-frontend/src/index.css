@@ -1,0 +1,20 @@
+:root {
+  --galaxy-bg: #0b0118;
+  --galaxy-card: #160a2c;
+  --galaxy-primary: #8b5cf6;
+  --galaxy-secondary: #d946ef;
+  --galaxy-accent: #00f2ff;
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+
+  --btn-gradient: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--galaxy-bg);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}

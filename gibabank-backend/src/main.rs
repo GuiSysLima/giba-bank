@@ -6,6 +6,7 @@ use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use tower_http::cors::{Any, CorsLayer};
 
 mod handlers;
 mod middleware;
@@ -20,6 +21,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .max_connections(5)
         .connect(&database_url)
         .await?;
+
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([
+            axum::http::Method::GET,
+            axum::http::Method::POST,
+            axum::http::Method::PUT,
+            axum::http::Method::DELETE,
+        ])
+        .allow_headers(Any);
 
     let app = Router::new()
         .route("/", get(|| async { "Giba Bank API Online!" }))
@@ -37,6 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "/users/:id/accounts",
             get(handlers::account::list_accounts_by_user),
         )
+        .layer(cors)
         .with_state(pool);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
