@@ -1,0 +1,25 @@
+.listContainer {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transactionItem:last-child {
+  border-bottom: none;
+}
+
+.amount {
+  font-weight: 600;
+}
+
+.income { color: #00ff88; }
+.outcome { color: #ff4d4d; }
